@@ -1,3 +1,28 @@
+[ignore]
+../../.meteor/packages/meteor-tool/.*
+.*/.meteor/packages/meteor-tool/.*
+../../.meteor/packages/npm-bcrypt/.*
+.*/.meteor/packages/npm-bcrypt/.*
+
+[include]
+# Ignore the `.meteor/local` packages that aren't important
+.*/.meteor/local/build/programs/server/app/.*
+.*/.meteor/local/build/programs/server/assets/.*
+.*/.meteor/local/build/programs/server/npm/.*
+.*/.meteor/local/build/programs/server/node_modules/.*
+.*/.meteor/local/build/programs/web.browser/app/.*
+.*/.meteor/local/build/main.js
+.*/client/.*
+.*/imports/.*
+.*/server/.*
+
+# This package can give you a lot of flow errors, better ignore it
+.*/node_modules/fbjs/.*
+
+[libs]
+
+[lints]
+
 [options]
 # Absolute path support:
 # e.g. "/collections/todos"
@@ -15,15 +40,4 @@ module.name_mapper='^meteor\/\(.*\)$' -> '<PROJECT_ROOT>/.meteor/local/build/pro
 # e.g. "meteor/meteor"
 module.name_mapper='^meteor\/\(.*\)$' -> '<PROJECT_ROOT>/.meteor/local/build/programs/web.browser/packages/\1'
 
-[ignore]
-# Ignore the `.meteor/local` packages that aren't important
-.*/.meteor/local/build/programs/server/app/.*
-.*/.meteor/local/build/programs/server/assets/.*
-.*/.meteor/local/build/programs/server/npm/.*
-.*/.meteor/local/build/programs/server/node_modules/.*
-.*/.meteor/local/build/programs/web.browser/app/.*
-.*/.meteor/local/build/main.js
-.*/.meteor/packages/.*
-
-# This package can give you a lot of flow errors, better ignore it
-.*/node_modules/fbjs/.*
+[strict]

@@ -1,11 +1,11 @@
+import AccountsUIWrapper from './AccountsUIWrapper.jsx';
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
-import { Meteor } from 'meteor/meteor';
-import { withTracker } from 'meteor/react-meteor-data';
-import { Tasks } from '../api/tasks.js';
 import Task from './Task.jsx';
-import AccountsUIWrapper from './AccountsUIWrapper.jsx';
+import { Meteor } from 'meteor/meteor';
 import { NavDropdown, MenuItem, FormControl, Button } from 'react-bootstrap';
+import { Tasks } from '../api/tasks.js';
+import { withTracker } from 'meteor/react-meteor-data';
 
 type Props = {
   tasks: object[]
@@ -31,7 +31,6 @@ class TaskList extends Component<Props, State> {
       project: ["mapping"]
     };
 
-    window.onkeyup = this.handleKey.bind(this);
   }
 
   handleKey(e) {
@@ -155,14 +154,9 @@ class TaskList extends Component<Props, State> {
   }
 
   renderSelect() {
-  let projects = new Set();
-    for (i in this.props.tasks) {
-      this.props.tasks[i].project && 
-        projects.add(this.props.tasks[i].project);
-    }
 
     let options = []
-    projects.forEach( x => options.push(
+    this.props.projects.forEach( x => options.push(
       <MenuItem key={x} eventKey={x}> {x} </MenuItem>
     ))
 
@@ -192,11 +186,30 @@ class TaskList extends Component<Props, State> {
   }
 
   render() {
+
+    let proj_time = this.props.tasks
+      .filter(x => {
+        return x.project == this.state.project[0]
+      })
+      .map(x => (x.time || 0))
+      .reduce( (a,b) => a+b, 0);
+
+    let date = new Date()
+    let count = 0
+
+    while (proj_time > 0 && count < 100) {
+      new_day = new Date(date.setDate(date.getDate() + 1))
+      day = Week.getDay(new_day);
+      proj_time -= day.filter(x => {
+        return !x.task && x.priority && x.priority.includes(this.state.project[0])
+      }).length;
+      count++;
+    }
+
     return (
       <div className="container">
         <div className="jumbotron">
           <AccountsUIWrapper />
-          <h1>Todo List ({this.props.incompleteCount})</h1>
           <div>
             <label className="hide-completed">
               <FormControl
@@ -220,6 +233,7 @@ class TaskList extends Component<Props, State> {
             </label>
           </div>
         { this.renderSelect() }
+        <div> estimate completion: {date.toLocaleDateString()} </div>
         { this.props.currentUser ?
             <form className="new-task" onSubmit={this.handleSubmit.bind(this)}>
               <FormControl
