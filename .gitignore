@@ -4,5 +4,5 @@ node_modules/
 **.un~
 *~
 
-nohup.out
+**.out
 

@@ -1,170 +1,0 @@
-[[[[[ ~/src/simple-todos ]]]]]
-
-=> Started proxy.
-=> A patch (Meteor 1.5.4.1) for your current release is available!
-   Update this project now with 'meteor update --patch'.
-=> Started MongoDB.
-=> Started your app.
-
-=> App running at: http://localhost:3000/
-Can't listen on port 3000. Perhaps another Meteor is running?
-
-Running two copies of Meteor in the same application directory
-will not work. If something else is using port 3000, you can
-specify an alternative port with --port <port>.
-[[[[[ ~/src/simple-todos ]]]]]
-
-=> Started proxy.
-=> A patch (Meteor 1.5.4.1) for your current release is available!
-   Update this project now with 'meteor update --patch'.
-=> Started MongoDB.
-=> Started your app.
-
-=> App running at: http://localhost:3000/
-Can't listen on port 3000. Perhaps another Meteor is running?
-
-Running two copies of Meteor in the same application directory
-will not work. If something else is using port 3000, you can
-specify an alternative port with --port <port>.
-Can't listen on port 3000. Perhaps another Meteor is running?
-
-Running two copies of Meteor in the same application directory
-will not work. If something else is using port 3000, you can
-specify an alternative port with --port <port>.
-[[[[[ ~/src/simple-todos ]]]]]
-
-=> Started proxy.
-=> A patch (Meteor 1.5.4.1) for your current release is available!
-   Update this project now with 'meteor update --patch'.
-=> Started MongoDB.
-=> Started your app.
-
-=> App running at: http://localhost:3000/
-[[[[[ ~/src/simple-todos ]]]]]
-
-=> Started proxy.
-=> A patch (Meteor 1.5.4.1) for your current release is available!
-   Update this project now with 'meteor update --patch'.
-=> Started MongoDB.
-=> Started your app.
-
-=> App running at: http://localhost:3000/
-=> Server modified -- restarting...                                   => Meteor server restarted
-=> Server modified -- restarting...                                   => Meteor server restarted
-=> Server modified -- restarting...                                   => Meteor server restarted
-=> Server modified -- restarting...                                   => Meteor server restarted
-=> Server modified -- restarting...                                   => Meteor server restarted
-=> Server modified -- restarting...                                   => Meteor server restarted
-=> Server modified -- restarting...                                   => Meteor server restarted
-=> Server modified -- restarting...                                   => Meteor server restarted
-=> Server modified -- restarting...                                   => Meteor server restarted
-=> Server modified -- restarting...                                   => Meteor server restarted
-=> Server modified -- restarting...                                   => Meteor server restarted
-=> Server modified -- restarting...                                   => Meteor server restarted
-=> Server modified -- restarting...                                   => Meteor server restarted
-=> Client modified -- refreshing
-=> Server modified -- restarting...                                   => Meteor server restarted
-=> Server modified -- restarting...                                   => Meteor server restarted
-=> Server modified -- restarting...                                   => Meteor server restarted
-=> Server modified -- restarting...                                   => Meteor server restarted
-=> Server modified -- restarting...                                   => Meteor server restarted
-=> Server modified -- restarting...                                   => Meteor server restarted
-=> Server modified -- restarting...                                   => Meteor server restarted
-=> Server modified -- restarting...                                   => Meteor server restarted
-=> Server modified -- restarting...                                   => Meteor server restarted
-=> Server modified -- restarting...                                   => Meteor server restarted
-=> Server modified -- restarting...                                   => Meteor server restarted
-=> Server modified -- restarting...                                   => Meteor server restarted
-=> Server modified -- restarting...                                   => Meteor server restarted
-=> Server modified -- restarting...                                   => Meteor server restarted
-=> Server modified -- restarting...                                   => Meteor server restarted
-=> Server modified -- restarting...                                   => Meteor server restarted
-=> Server modified -- restarting...                                   => Meteor server restarted
-=> Server modified -- restarting...                                   => Errors prevented startup:
-   
-   While building for web.browser:
-   imports/ui/TimeBlock.jsx:79:12: Adjacent JSX elements must be wrapped in an
-   enclosing tag (79:12)
-   
-=> Your application has errors. Waiting for file change.
-=> Modified -- restarting.
-=> Errors prevented startup:
-   
-   While building for web.browser:
-   imports/ui/TimeBlock.jsx:79:10: Adjacent JSX elements must be wrapped in an
-   enclosing tag (79:10)
-   
-=> Your application has errors. Waiting for file change.
-=> Modified -- restarting.
-=> Errors prevented startup:
-   
-   While building for web.browser:
-   imports/ui/TimeBlock.jsx:78:12: Expected corresponding JSX closing tag for
-   <span> (78:12)
-   
-=> Your application has errors. Waiting for file change.
-=> Modified -- restarting.
-=> Errors prevented startup:
-   
-   While building for web.browser:
-   imports/ui/TimeBlock.jsx:71:17: Expected corresponding JSX closing tag for
-   <DropdownButton> (71:17)
-   
-=> Your application has errors. Waiting for file change.
-=> Modified -- restarting.
-=> Errors prevented startup:
-   
-   While building for web.browser:
-   imports/ui/TimeBlock.jsx:78:15: this is a reserved word (78:15)
-   
-=> Your application has errors. Waiting for file change.
-=> Modified -- restarting.
-=> Errors prevented startup:
-   
-   While building for web.browser:
-   imports/ui/TimeBlock.jsx:78:12: Unexpected token, expected : (78:12)
-   
-=> Your application has errors. Waiting for file change.
-=> Modified -- restarting.
-=> Errors prevented startup:
-   
-   While building for web.browser:
-   imports/ui/TimeBlock.jsx:78:12: Unexpected token, expected : (78:12)
-   
-=> Your application has errors. Waiting for file change.
-=> Modified -- restarting.
-=> Meteor server restarted
-=> Server modified -- restarting...                                   => Errors prevented startup:
-   
-   While building for web.browser:
-   imports/ui/TimeBlock.jsx:81:10: Adjacent JSX elements must be wrapped in an
-   enclosing tag (81:10)
-   
-=> Your application has errors. Waiting for file change.
-=> Modified -- restarting.
-=> Errors prevented startup:
-   
-   While building for web.browser:
-   imports/ui/TimeBlock.jsx:81:10: Unexpected token, expected , (81:10)
-   
-=> Your application has errors. Waiting for file change.
-=> Modified -- restarting.
-=> Meteor server restarted
-=> Server modified -- restarting...                                   => Meteor server restarted[[[[[ ~/src/simple-todos ]]]]]
-
-=> Started proxy.
-=> A patch (Meteor 1.5.4.1) for your current release is available!
-   Update this project now with 'meteor update --patch'.
-=> Started MongoDB.
-=> Started your app.
-
-=> App running at: http://localhost:3000/
-[[[[[ ~/src/simple-todos ]]]]]
-
-=> Started proxy.
-=> A patch (Meteor 1.5.4.1) for your current release is available!
-   Update this project now with 'meteor update --patch'.
-=> Started MongoDB.
-=> Started your app.
-
-=> App running at: http://localhost:3000/
