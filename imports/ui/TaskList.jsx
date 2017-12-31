@@ -28,7 +28,7 @@ class TaskList extends Component<Props, State> {
       hideCompleted: false,
       estimate: false,
       selectedItem: 0,
-      project: ["mapping"]
+      project: []
     };
 
   }

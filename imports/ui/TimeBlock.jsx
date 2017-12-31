@@ -79,7 +79,7 @@ export default class TimeBlock extends Component<Props, State> {
             <b>[{this.props.x.task.project}]</b> {this.props.x.task.text} 
           </td>
         )}
-        {this.props.x.task._id ? (
+        {this.props.x.task && this.props.x.task._id ? (
           <td>
             <Button
               className="delete btn btn-info" 
