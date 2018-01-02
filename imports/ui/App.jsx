@@ -129,6 +129,23 @@ class App extends Component<Props, State> {
     </ul>
     </div>)
 
+  /**
+   * gets the schedule for a given day
+   */
+  getDay(date) {
+    let day = JSON.parse(JSON.stringify(Week.week[date.getDay()]));
+    let dateString = date.toLocaleDateString().split('T')[0];
+    let appts = this.props.appointments.filter(x => x.date == dateString);
+    for (i in appts) {
+      for (j = appts[i].start; j < appts[i].end; j = 0.5 + j) {
+        let block = day.filter(x => x.time == j)[0];
+        block.task = appts[i].task || appts[i].text;
+        block.appointment = appts[i];
+      }
+    }
+    return day;
+  }
+
   render() {
 
     let projects = []
@@ -140,6 +157,15 @@ class App extends Component<Props, State> {
       }
       projects = Array.from(projects);
     }
+
+    let date = new Date();
+    let hour = date.getHours();
+    if (date.getMinutes() > 30) {
+      date += 0.5;
+    }
+
+    projs = this.getDay(date).filter(x => x.time >= hour);
+
     let windows = [
       (<Schedule 
         row={this.state.row}
@@ -150,6 +176,7 @@ class App extends Component<Props, State> {
         row={this.state.row}
         tasks={this.props.tasks}
         projects={projects}
+        project={projs[0].priority}
       />),
       this.rubric
     ]

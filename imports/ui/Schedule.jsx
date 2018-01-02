@@ -152,7 +152,7 @@ class Schedule extends Component<Props, State> {
 
     // changing iso format to locale date format
     dateEls = args[0].split("-")
-    args[0] = dateEls[1] + "/" + dateEls[2] + "/" + dateEls[0]
+    args[0] = "" + parseInt(dateEls[1]) + "/" + parseInt(dateEls[2]) + "/" + dateEls[0]
 
     Meteor.call('appointments.insert', ...args);
 

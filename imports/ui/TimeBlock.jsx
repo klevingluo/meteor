@@ -45,19 +45,21 @@ export default class TimeBlock extends Component<Props, State> {
         style={{border: "1px solid black"}}>
         <td> {this.props.x.time}: </td>
         {this.props.x.appointment ? (
-          <td> 
-            <span>
-              <b>[appointment]</b> {this.props.x.appointment.text}
-            </span>
-            <Button
-              className="delete btn btn-danger" 
-              bsSize="xsmall"
-              onClick={
-                this.removeAppointment.bind(this, this.props.x.appointment._id)
-              }>
-              X
-            </Button>
-          </td>
+          [
+            <td> 
+              <span>
+                <b>[appointment]</b> {this.props.x.appointment.text}
+              </span>
+              <Button
+                className="delete btn btn-danger" 
+                bsSize="xsmall"
+                onClick={
+                  this.removeAppointment.bind(this, this.props.x.appointment._id)
+                }>
+                Cancel
+              </Button>
+            </td>
+          ]
         ) : (
           <td> 
             {this.props.editMode &&

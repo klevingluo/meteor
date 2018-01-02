@@ -30,7 +30,6 @@ class TaskList extends Component<Props, State> {
       selectedItem: 0,
       project: []
     };
-
   }
 
   handleKey(e) {
@@ -115,7 +114,10 @@ class TaskList extends Component<Props, State> {
   renderTasks() {
     let filteredTasks = this.props.tasks;
 
-    if (this.state.project.length) {
+    if (this.props.project.length) {
+      filteredTasks = filteredTasks.filter(
+        task => this.props.project.includes(task.project));
+    } else if (this.state.project.length) {
       filteredTasks = filteredTasks.filter(
         task => this.state.project.includes(task.project));
     }
@@ -186,7 +188,6 @@ class TaskList extends Component<Props, State> {
   }
 
   render() {
-
     let proj_time = this.props.tasks
       .filter(x => {
         return x.project == this.state.project[0]
