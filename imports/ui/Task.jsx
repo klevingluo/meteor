@@ -1,12 +1,14 @@
+// @flow
 import React, { Component, PropTypes } from 'react';
 import ReactDOM from 'react-dom';
 import classnames from 'classnames';
 import { Meteor } from 'meteor/meteor';
 import { Tasks } from '../api/tasks.js';
 import { Form, FormControl, Button } from 'react-bootstrap';
+import type { taskT } from './Schedule.jsx';
 
 type Props = {
-  task: object,
+  task: taskT,
   selected: boolean
 }
 
@@ -25,14 +27,14 @@ export default class Task extends Component<Props> {
   }
 
   setUtility() {
-    const value = 
-      ReactDOM.findDOMNode(this.refs[this.props.task._id + "utility"]).value.trim();
+    const ref = ReactDOM.findDOMNode(this.refs[this.props.task._id + "utility"])
+    let value = ref && ref.value ? ref.value.trim() : 0
     Meteor.call('tasks.setUtility', this.props.task._id, Number(value));
   }
 
   setTime() {
-    const value = 
-      ReactDOM.findDOMNode(this.refs[this.props.task._id + "time"]).value.trim();
+    const ref = ReactDOM.findDOMNode(this.refs[this.props.task._id + "time"])
+    let value = ref && ref.value ? ref.value.trim() : 0
     Meteor.call('tasks.setTime', this.props.task._id, Number(value));
   }
 

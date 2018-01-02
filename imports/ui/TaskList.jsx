@@ -114,12 +114,12 @@ class TaskList extends Component<Props, State> {
   renderTasks() {
     let filteredTasks = this.props.tasks;
 
-    if (this.props.project.length) {
-      filteredTasks = filteredTasks.filter(
-        task => this.props.project.includes(task.project));
-    } else if (this.state.project.length) {
+    if (this.state.project.length) {
       filteredTasks = filteredTasks.filter(
         task => this.state.project.includes(task.project));
+    } else if (this.props.project) {
+      filteredTasks = filteredTasks.filter(
+        task => this.props.project.includes(task.project));
     }
 
     if (this.state.hideCompleted) {

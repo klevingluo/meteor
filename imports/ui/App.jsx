@@ -1,10 +1,12 @@
 import AccountsUIWrapper from './AccountsUIWrapper.jsx';
+import Week from '../data/week.js';
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import Schedule from './Schedule.jsx';
 import Task from './Task.jsx';
 import TaskList from './TaskList.jsx';
 import { Appointments } from '../api/appointments.js';
+import { ScheduleTemplate } from '../api/schedule.js';
 import { Col } from 'react-bootstrap';
 import { FormControl, Button } from 'react-bootstrap';
 import { Meteor } from 'meteor/meteor';
@@ -133,7 +135,7 @@ class App extends Component<Props, State> {
    * gets the schedule for a given day
    */
   getDay(date) {
-    let day = JSON.parse(JSON.stringify(Week.week[date.getDay()]));
+    let day = JSON.parse(JSON.stringify(Week.Week.week[date.getDay()]));
     let dateString = date.toLocaleDateString().split('T')[0];
     let appts = this.props.appointments.filter(x => x.date == dateString);
     for (i in appts) {
@@ -148,6 +150,7 @@ class App extends Component<Props, State> {
 
   render() {
 
+    window.ca = this.props.schedule;
     let projects = []
     if (this.props.tasks) {
       projects = new Set();
@@ -161,7 +164,7 @@ class App extends Component<Props, State> {
     let date = new Date();
     let hour = date.getHours();
     if (date.getMinutes() > 30) {
-      date += 0.5;
+      hour += 0.5;
     }
 
     projs = this.getDay(date).filter(x => x.time >= hour);
@@ -229,7 +232,9 @@ function getLeverage(task) {
 export default withTracker(props => {
   Meteor.subscribe('tasks');
   Meteor.subscribe('appointments');
+  Meteor.subscribe('schedule');
   const appointments = Appointments.find({}, {sort: {createdAt: -1}}).fetch();
+  const schedule = ScheduleTemplate.find({}, {sort: {createdAt: -1}}).fetch();
 
   const tasks = Tasks.find({}, {})
     .fetch()
@@ -258,5 +263,6 @@ export default withTracker(props => {
     tasks: tasks,
     incompleteCount: Tasks.find({ checked: {$ne: true} }).count(),
     currentUser: Meteor.user(),
+    schedule: schedule,
   };
 })(App)

@@ -31,6 +31,8 @@ export type taskT = {
   value: ?number, // the value of completing this task
   time: ?number,  // the amount of time, in 0.5 our increments needed to complete this task
   project: ?string, // the project that this task belongs to
+  checked: boolean, // whether or not the task is done
+  private: boolean,
   _id: string
 }
 
@@ -119,12 +121,7 @@ type Props = {
 }
 
 type State = {
-  hour: number,
   collapse: boolean,
-  tasks: Object[],
-  appointments: Object[],
-  incompleteCount: Number,
-  currentUser: String
 }
 
 // Schedule component - represents the schedule component of the app
@@ -133,7 +130,7 @@ class Schedule extends Component<Props, State> {
     super(props);
 
     this.state = {
-      hour: this.props.hour
+      collapse: false
     };
   }
 
@@ -141,7 +138,7 @@ class Schedule extends Component<Props, State> {
     event.preventDefault();
 
     // Find the text field via the react ref
-    args = ReactDOM.findDOMNode(this.refs.eventInput).value
+    let args = ReactDOM.findDOMNode(this.refs.eventInput).value
       .trim()
       .split(' ')
       .map(x => parseFloat(x) == x ? parseFloat(x) : x);
