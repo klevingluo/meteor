@@ -130,7 +130,8 @@ class Schedule extends Component<Props, State> {
     super(props);
 
     this.state = {
-      collapse: false
+      collapse: false,
+      hour: this.props.hour
     };
   }
 
@@ -280,11 +281,12 @@ class Schedule extends Component<Props, State> {
 
   render() {
     let date = new Date();
+
     let tomorrowDate = new Date();
     tomorrowDate.setDate(tomorrowDate.getDate() + 1);
 
     let date3date = new Date();
-    date3date.setDate(tomorrowDate.getDate() + 2);
+    date3date.setDate(date3date.getDate() + 2);
 
     let today = this.getDay(date).filter(x => x.time >= this.state.hour);
     let tomorrow = this.getDay(tomorrowDate);
@@ -332,6 +334,7 @@ class Schedule extends Component<Props, State> {
               schedule.map(x => {
                 return (
                   <TimeBlock 
+                    key={x.time}
                     x={x}
                     editMode={this.state.collapse}
                     projects={this.props.projects}

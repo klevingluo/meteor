@@ -93,30 +93,32 @@ class App extends Component<Props, State> {
     <ul>
       <li>
         <table>
-          <tr>
-            <th></th>
-            <th> urgent </th>
-            <th> time sensitive </th>
-            <th> only waiting on me </th>
-          </tr>
-          <tr>
-            <td><b>milestone</b></td>
-            <td>21</td>
-            <td>13</td>
-            <td>8</td>
-          </tr>
-          <tr>
-            <td><b>progress</b></td>
-            <td>13</td>
-            <td>8</td>
-            <td>5</td>
-          </tr>
-          <tr>
-            <td><b>small progress</b></td>
-            <td>5</td>
-            <td>3</td>
-            <td>1</td>
-          </tr>
+          <tbody>
+            <tr>
+              <th></th>
+              <th> urgent </th>
+              <th> time sensitive </th>
+              <th> only waiting on me </th>
+            </tr>
+            <tr>
+              <td><b>milestone</b></td>
+              <td>21</td>
+              <td>13</td>
+              <td>8</td>
+            </tr>
+            <tr>
+              <td><b>progress</b></td>
+              <td>13</td>
+              <td>8</td>
+              <td>5</td>
+            </tr>
+            <tr>
+              <td><b>small progress</b></td>
+              <td>5</td>
+              <td>3</td>
+              <td>1</td>
+            </tr>
+          </tbody>
         </table>
       </li>
     </ul>
@@ -129,7 +131,7 @@ class App extends Component<Props, State> {
       <li>64: 32 hr / hard for an expert, and I'm not one</li>
       <li>128: 64 hr / hard for an expert, and I'm clueless</li>
     </ul>
-    </div>)
+</div>)
 
   /**
    * gets the schedule for a given day
