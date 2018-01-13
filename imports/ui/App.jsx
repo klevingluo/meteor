@@ -17,6 +17,7 @@ type Props = {
 }
 
 type State = {
+  hour: number,
   row: number,
   activeWindow: number
 }
@@ -29,11 +30,47 @@ class App extends Component<Props, State> {
 
     this.state = {
       activeWindow: 0,
-      row: 0
+      row: 0,
+      hour: this.getHour()
     };
     window.onkeyup = this.handleKey.bind(this);
   }
+  // update the time every minute
+  componentDidMount() {
+    this.timerID = setInterval(
+      () => this.tick(),
+      60000
+    );
+  }
 
+  getHour() {
+    let date = new Date();
+    let hour = date.getHours();
+    if (date.getMinutes() > 30) {
+      hour += 0.5;
+    }
+    return hour;
+  }
+
+  tick() {
+    this.setState({
+      hour: this.getHour()
+    })
+  }
+
+  /**
+   * calculates the benefit per unit time of the task
+   */
+  getLeverage(task) {
+    if (task.checked) {
+      return -1;
+    } else if (!task.utility || !task.time) {
+      return 0;
+    } else {
+      return task.utility/task.time;
+    }
+  }
+    
   /**
    * takes a schedule and puts tasks into them
    */
@@ -84,6 +121,9 @@ class App extends Component<Props, State> {
           activeWindow: (this.state.activeWindow - 1) % 3
         });
         break;
+      case 'o':
+        document.getElementsByClassName("rbt-input")[0].focus()
+        break;
       default:
     }
 
@@ -91,6 +131,13 @@ class App extends Component<Props, State> {
 
   rubric = (<div>
     <ul>
+      <li> 
+        <p>
+          type <b> times </b> in console to see length 
+          of projects and <b> priorities </b> to see time 
+          allocated
+        </p>
+      </li>
       <li>
         <table>
           <tbody>
@@ -143,8 +190,10 @@ class App extends Component<Props, State> {
     for (i in appts) {
       for (j = appts[i].start; j < appts[i].end; j = 0.5 + j) {
         let block = day.filter(x => x.time == j)[0];
-        block.task = appts[i].task || appts[i].text;
-        block.appointment = appts[i];
+        if (block) {
+          block.task = appts[i].task || appts[i].text;
+          block.appointment = appts[i];
+        }
       }
     }
     return day;
@@ -152,13 +201,17 @@ class App extends Component<Props, State> {
 
   render() {
 
-    window.ca = this.props.schedule;
-    let projects = []
+    let projects = [];
+    let times = {};
+    window.times = times;
     if (this.props.tasks) {
       projects = new Set();
       for (i in this.props.tasks) {
-        this.props.tasks[i].project && 
-          projects.add(this.props.tasks[i].project);
+        project = this.props.tasks[i].project;
+        if (project) {
+          projects.add(project);
+          times[project] = (times[project] | 0) + 1;
+        }
       }
       projects = Array.from(projects);
     }
@@ -169,13 +222,35 @@ class App extends Component<Props, State> {
       hour += 0.5;
     }
 
-    projs = this.getDay(date).filter(x => x.time >= hour);
+    projs = this.getDay(date).filter(x => x.time >= this.state.hour);
+
+    // start scheduling tasks
+
+    let tomorrowDate = new Date();
+    tomorrowDate.setDate(tomorrowDate.getDate() + 1);
+
+    let date3date = new Date();
+    date3date.setDate(date3date.getDate() + 2);
+
+    let today = this.getDay(date).filter(x => x.time >= this.state.hour);
+    let tomorrow = this.getDay(tomorrowDate);
+    let date3 = this.getDay(date3date)
+
+    let tasks = JSON.parse(JSON.stringify(this.props.tasks)); 
+
+    let today_sched = this.scheduleTasks(today, tasks);
+    let tom_sched = this.scheduleTasks(tomorrow, tasks);
+    let date3_sched = this.scheduleTasks(date3, tasks);
+    // end scheudlling tasks
+    
+    let schedule = [today_sched , tom_sched , date3_sched] 
 
     let windows = [
       (<Schedule 
         row={this.state.row}
         tasks={this.props.tasks}
         projects={projects}
+        schedule={schedule}
       />),
       (<TaskList 
         row={this.state.row}
@@ -253,14 +328,7 @@ export default withTracker(props => {
       return -1;
     });
 
-  let time = new Date();
-  let hour = time.getHours();
-  if (time.getMinutes() > 30) {
-    hour += 0.5;
-  }
-
   return {
-    hour: hour,
     appointments: appointments,
     tasks: tasks,
     incompleteCount: Tasks.find({ checked: {$ne: true} }).count(),

@@ -4,6 +4,7 @@ import ReactDOM from 'react-dom';
 import Task from './Task.jsx';
 import { Meteor } from 'meteor/meteor';
 import { NavDropdown, MenuItem, FormControl, Button } from 'react-bootstrap';
+import { Typeahead} from 'react-bootstrap-typeahead';
 import { Tasks } from '../api/tasks.js';
 import { withTracker } from 'meteor/react-meteor-data';
 
@@ -235,6 +236,16 @@ class TaskList extends Component<Props, State> {
           </div>
         { this.renderSelect() }
         <div> estimate completion: {date.toLocaleDateString()} </div>
+        <Typeahead 
+          ref="projecter"
+          options = {this.props.projects}
+          selectHintOnEnter = {true}
+          onChange = {x => {
+            this.setState({
+              project: x
+            })
+          }}
+        />
         { this.props.currentUser ?
             <form className="new-task" onSubmit={this.handleSubmit.bind(this)}>
               <FormControl

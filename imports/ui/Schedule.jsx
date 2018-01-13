@@ -42,7 +42,7 @@ export type taskT = {
 export type timeBlockT = {
   time: number,       // the hour of the day
   default: ?string,   // the default activity for this time of day, 
-                      //    probably not used execpt for mornings, evenings, and meals
+  //    probably not used execpt for mornings, evenings, and meals
   task: ?taskT,       // the task that is assigned to this block
   project: ?string,   // the project that is this block's priority
   appointement: ?appointmentT, // an appointment that has been assigned to this time block
@@ -112,12 +112,7 @@ export type scheduleT = timeBlockT[]
  */
 
 type Props = {
-  hour: String,
-  tasks: Object[],
   appointments: Object[],
-  incompleteCount: Number,
-  currentUser: String,
-  projects: string[]
 }
 
 type State = {
@@ -131,30 +126,36 @@ class Schedule extends Component<Props, State> {
 
     this.state = {
       collapse: false,
-      hour: this.props.hour
     };
   }
+
 
   handleSubmit(event) {
     event.preventDefault();
 
     // Find the text field via the react ref
-    let args = ReactDOM.findDOMNode(this.refs.eventInput).value
-      .trim()
-      .split(' ')
-      .map(x => parseFloat(x) == x ? parseFloat(x) : x);
+    const node = ReactDOM.findDOMNode(this.refs.eventInput);
 
-    if (args.length > 4) {
-      args[3] = args.slice(3).join(' ');
+    if (node instanceof HTMLInputElement) {
+      const args = node.value
+        .trim()
+        .split(' ')
+        .map(x => parseFloat(x) == x ? parseFloat(x) : x);
+
+      if (args.length > 4) {
+        args[3] = args.slice(3).join(' ');
+      }
+
+      // changing iso format to locale date format
+      dateEls = args[0].split("-")
+      args[0] = "" + parseInt(dateEls[1]) + "/" + parseInt(dateEls[2]) + "/" + dateEls[0]
+
+      Meteor.call('appointments.insert', ...args);
+
+      ReactDOM.findDOMNode(this.refs.eventInput).value = '';
+    } else {
+      console.log("error: input: " + this.refs.eventInput + " not found")
     }
-
-    // changing iso format to locale date format
-    dateEls = args[0].split("-")
-    args[0] = "" + parseInt(dateEls[1]) + "/" + parseInt(dateEls[2]) + "/" + dateEls[0]
-
-    Meteor.call('appointments.insert', ...args);
-
-    ReactDOM.findDOMNode(this.refs.eventInput).value = '';
   }
 
   prefillInput(event) {
@@ -176,54 +177,7 @@ class Schedule extends Component<Props, State> {
     )
   }
 
-  /**
-   * calculates the benefit per unit time of the task
-   */
-  getLeverage(task) {
-    if (task.checked) {
-      return -1;
-    } else if (!task.utility || !task.time) {
-      return 0;
-    } else {
-      return task.utility/task.time;
-    }
-  }
-
-  /**
-   * takes a schedule and assigns tasks to it
-   */
-  scheduleTasks(schedule, tasks) {
-    let timetable = [];
-
-    for (i=0; i<schedule.length; i++) {
-      if (schedule[i].appointment) {
-        timetable.push({
-          time: schedule[i].time,
-          appointment: schedule[i].appointment
-        });
-      } else if (schedule[i].task) {
-        timetable.push({
-          time: schedule[i].time,
-          task: {project: 'preset', text: schedule[i].task}
-        });
-      } else {
-        let task = tasks.filter(x => {
-          return x.project && schedule[i].priority.includes(x.project) && x.time > 0;
-        })[0] 
-        if (task && task.time > 0) {
-          timetable.push({
-            time: schedule[i].time,
-            task: task,
-          });
-          task.time = task.time - 1;
-        } else {
-          timetable.push({
-            time: schedule[i].time,
-            task: {text: schedule[i].priority[0], project: 'prioritizing'}
-          });
-        }
-      }
-    }
+  collapseTasks(timetable) {
     if (!this.state.collapse) {
       for (i=0; i < timetable.length-1; i++) {
         remove = 
@@ -240,23 +194,6 @@ class Schedule extends Component<Props, State> {
       }
     }
     return timetable
-  }
-
-  /**
-   * gets the schedule for a given day
-   */
-  getDay(date) {
-    let day = JSON.parse(JSON.stringify(Week.week[date.getDay()]));
-    let dateString = date.toLocaleDateString().split('T')[0];
-    let appts = this.props.appointments.filter(x => x.date == dateString);
-    for (i in appts) {
-      for (j = appts[i].start; j < appts[i].end; j = 0.5 + j) {
-        let block = day.filter(x => x.time == j)[0];
-        block.task = appts[i].task || appts[i].text;
-        block.appointment = appts[i];
-      }
-    }
-    return day;
   }
 
   toggleCollapse() {
@@ -288,34 +225,13 @@ class Schedule extends Component<Props, State> {
     let date3date = new Date();
     date3date.setDate(date3date.getDate() + 2);
 
-    let today = this.getDay(date).filter(x => x.time >= this.state.hour);
-    let tomorrow = this.getDay(tomorrowDate);
-    let date3 = this.getDay(date3date)
-
-    let tasks = this.props.tasks.sort((a,b) => {
-      let leva = this.getLeverage(a) 
-      let levb = this.getLeverage(b) 
-      if (leva > levb) {
-        return -1;
-      } else if (levb > leva) {
-        return 1;
-      } else if (a.text < b.text) {
-        return 1;
-      }
-      return -1;
-    });
-
-    let today_sched = this.scheduleTasks(today, tasks);
-    let tom_sched = this.scheduleTasks(tomorrow, tasks);
-    let date3_sched = this.scheduleTasks(date3, tasks);
-
     return (
       <div className="container">
         { this.renderCollapsedCheckbox() }
         { this.renderEventForm() }
-        { this.renderSchedule(today_sched, date, 'today') }
-        { this.renderSchedule(tom_sched, tomorrowDate, 'tomorrow') }
-        { this.renderSchedule(date3_sched, date3date, '2 days from now') }
+        { this.renderSchedule(this.collapseTasks(this.props.schedule[0]), date, 'today') }
+        { this.renderSchedule(this.collapseTasks(this.props.schedule[1]), tomorrowDate, 'tomorrow') }
+        { this.renderSchedule(this.collapseTasks(this.props.schedule[2]), date3date, '2 days from now') }
       </div>
     );
   }
@@ -349,23 +265,4 @@ class Schedule extends Component<Props, State> {
   }
 }
 
-export default withTracker(props => {
-  Meteor.subscribe('tasks');
-  Meteor.subscribe('appointments');
-  const tasks = Tasks.find({}, {sort: {createdAt: -1}}).fetch();
-  const appointments = Appointments.find({}, {sort: {createdAt: -1}}).fetch();
-
-  let time = new Date();
-  let hour = time.getHours();
-  if (time.getMinutes() > 30) {
-    hour += 0.5;
-  }
-
-  return {
-    hour: hour,
-    tasks: tasks,
-    appointments: appointments,
-    incompleteCount: Tasks.find({ checked: {$ne: true} }).count(),
-    currentUser: Meteor.user(),
-  };
-})(Schedule)
+export default Schedule;
