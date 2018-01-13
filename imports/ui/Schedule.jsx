@@ -8,7 +8,6 @@ import { Appointments } from '../api/appointments.js';
 import { NavDropdown, MenuItem, FormControl, Button } from 'react-bootstrap';
 import { Meteor } from 'meteor/meteor';
 import { Tasks } from '../api/tasks.js';
-import { Week } from '../data/week.js';
 import { withTracker } from 'meteor/react-meteor-data';
 
 /**
@@ -177,7 +176,8 @@ class Schedule extends Component<Props, State> {
     )
   }
 
-  collapseTasks(timetable) {
+  collapseTasks(timetableish) {
+    let timetable = JSON.parse(JSON.stringify(timetableish));
     if (!this.state.collapse) {
       for (i=0; i < timetable.length-1; i++) {
         remove = 
@@ -225,13 +225,28 @@ class Schedule extends Component<Props, State> {
     let date3date = new Date();
     date3date.setDate(date3date.getDate() + 2);
 
+    let sched0 = this.props.schedule[0]
+    if ( !this.state.collapse ) {
+      sched0 = this.collapseTasks(this.props.schedule[0])
+    } 
+
+    let sched1 = this.props.schedule[1]
+    if ( !this.state.collapse ) {
+      sched1 = this.collapseTasks(this.props.schedule[1])
+    } 
+
+    let sched2 = this.props.schedule[2]
+    if ( !this.state.collapse ) {
+      sched2 = this.collapseTasks(this.props.schedule[2])
+    } 
+
     return (
       <div className="container">
         { this.renderCollapsedCheckbox() }
         { this.renderEventForm() }
-        { this.renderSchedule(this.collapseTasks(this.props.schedule[0]), date, 'today') }
-        { this.renderSchedule(this.collapseTasks(this.props.schedule[1]), tomorrowDate, 'tomorrow') }
-        { this.renderSchedule(this.collapseTasks(this.props.schedule[2]), date3date, '2 days from now') }
+        { this.renderSchedule(sched0, date, 'today') }
+        { this.renderSchedule(sched1, tomorrowDate, 'tomorrow') }
+        { this.renderSchedule(sched2, date3date, '2 days from now') }
       </div>
     );
   }
@@ -254,6 +269,8 @@ class Schedule extends Component<Props, State> {
                     x={x}
                     editMode={this.state.collapse}
                     projects={this.props.projects}
+                    changeSchedule={(priority) => 
+                    this.props.changeSchedule(date.getDay(), x.time, priority)}
                   />
                 );
               })

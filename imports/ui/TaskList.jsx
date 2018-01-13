@@ -165,17 +165,6 @@ class TaskList extends Component<Props, State> {
 
     return (
       <span>
-        <NavDropdown 
-          title="load project"
-          activeKey={this.state.project[0]}
-          ref="project" 
-          id="project"
-          name={this.state.project}
-          onSelect={this.changeProject.bind(this)}
-        >
-          <MenuItem key={"default"} eventKey={""}> all </MenuItem>
-          { options }
-        </NavDropdown>
         {this.state.project.map(x => (
           <Button 
             key={x}
@@ -201,7 +190,7 @@ class TaskList extends Component<Props, State> {
 
     while (proj_time > 0 && count < 100) {
       new_day = new Date(date.setDate(date.getDate() + 1))
-      day = Week.getDay(new_day);
+      day=this.props.schedule[new_day] || []
       proj_time -= day.filter(x => {
         return !x.task && x.priority && x.priority.includes(this.state.project[0])
       }).length;
@@ -273,5 +262,6 @@ export default withTracker(props => {
     tasks: tasks,
     incompleteCount: Tasks.find({ checked: {$ne: true} }).count(),
     currentUser: Meteor.user(),
+    schedule: props.schedule
   };
 })(TaskList)

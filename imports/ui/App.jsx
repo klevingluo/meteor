@@ -1,5 +1,4 @@
 import AccountsUIWrapper from './AccountsUIWrapper.jsx';
-import Week from '../data/week.js';
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import Schedule from './Schedule.jsx';
@@ -35,6 +34,7 @@ class App extends Component<Props, State> {
     };
     window.onkeyup = this.handleKey.bind(this);
   }
+
   // update the time every minute
   componentDidMount() {
     this.timerID = setInterval(
@@ -70,7 +70,7 @@ class App extends Component<Props, State> {
       return task.utility/task.time;
     }
   }
-    
+
   /**
    * takes a schedule and puts tasks into them
    */
@@ -122,7 +122,7 @@ class App extends Component<Props, State> {
         });
         break;
       case 'o':
-        document.getElementsByClassName("rbt-input")[0].focus()
+        //document.getElementsByClassName("rbt-input")[0].focus()
         break;
       default:
     }
@@ -180,11 +180,21 @@ class App extends Component<Props, State> {
     </ul>
 </div>)
 
+  changeSchedule(day, hour, priority) {
+    let timetable = JSON.parse(JSON.stringify( this.props.schedule[day].schedule));
+    timetable[hour*2].priority = [priority]
+    Meteor.call('schedule.change', day, timetable);
+  }
+
   /**
    * gets the schedule for a given day
    */
   getDay(date) {
-    let day = JSON.parse(JSON.stringify(Week.Week.week[date.getDay()]));
+    let timetable = this.props.schedule[date.getDay()];
+    if (!timetable) {
+      return [{time: 200,priority: ""}];
+    }
+    let day = JSON.parse(JSON.stringify(timetable.schedule));
     let dateString = date.toLocaleDateString().split('T')[0];
     let appts = this.props.appointments.filter(x => x.date == dateString);
     for (i in appts) {
@@ -217,12 +227,6 @@ class App extends Component<Props, State> {
     }
 
     let date = new Date();
-    let hour = date.getHours();
-    if (date.getMinutes() > 30) {
-      hour += 0.5;
-    }
-
-    projs = this.getDay(date).filter(x => x.time >= this.state.hour);
 
     // start scheduling tasks
 
@@ -242,7 +246,7 @@ class App extends Component<Props, State> {
     let tom_sched = this.scheduleTasks(tomorrow, tasks);
     let date3_sched = this.scheduleTasks(date3, tasks);
     // end scheudlling tasks
-    
+
     let schedule = [today_sched , tom_sched , date3_sched] 
 
     let windows = [
@@ -251,12 +255,14 @@ class App extends Component<Props, State> {
         tasks={this.props.tasks}
         projects={projects}
         schedule={schedule}
+        changeSchedule={this.changeSchedule.bind(this)}
       />),
       (<TaskList 
         row={this.state.row}
         tasks={this.props.tasks}
         projects={projects}
-        project={projs[0].priority}
+        project={today[0].priority}
+        schedule={this.props.schedule}
       />),
       this.rubric
     ]
@@ -311,7 +317,7 @@ export default withTracker(props => {
   Meteor.subscribe('appointments');
   Meteor.subscribe('schedule');
   const appointments = Appointments.find({}, {sort: {createdAt: -1}}).fetch();
-  const schedule = ScheduleTemplate.find({}, {sort: {createdAt: -1}}).fetch();
+  const schedule = ScheduleTemplate.find({}, {sort: {day: 1}}).fetch();
 
   const tasks = Tasks.find({}, {})
     .fetch()
@@ -327,6 +333,35 @@ export default withTracker(props => {
       }
       return -1;
     });
+
+  let week = [0,1,2,3,4,5,6];
+  let hours = [];
+  for (let i=0; i< 24; i += 0.5) {
+    hours.push(i);
+  }
+  let schedules = week.map(x => {
+    return hours.map(h => {
+      let search = 
+        ScheduleTemplate.findOne( {time: h, day: x})
+      priority = search ? search.priority[0] : null
+      return {
+        time: h,
+        priority: priority,
+      };
+    })
+  })
+
+  times = {}
+  window.schedule= schedule;
+  for (day in schedule) {
+    for (block in schedule[day].schedule) {
+      if (schedule[day].schedule[block].priority) {
+        project = schedule[day].schedule[block].priority;
+        times[project] = (times[project] | 0) + 1;
+      }
+    }
+  }
+  window.priorities = times;
 
   return {
     appointments: appointments,

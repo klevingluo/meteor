@@ -18,15 +18,15 @@ if (Meteor.isServer) {
 }
 
 Meteor.methods({
-  'schedule.change'(day, time, priority) {
+  'schedule.change'(day, schedule) {
 
     //Make sure the user is logged in before inserting a task
     if (! this.userId) {
       throw new Meteor.Error('not-authorized');
     }
 
-    const item = ScheduleTemplate.findOne({day: day, time: time})
-    while (item) {
+    const item = ScheduleTemplate.findOne({day: day})
+    if (item) {
       ScheduleTemplate.remove(item._id);
     }
 
@@ -35,8 +35,19 @@ Meteor.methods({
       owner: this.userId,
       username: Meteor.users.findOne(this.userId).username,
       day: day,
-      time: time,
-      priority: priority
+      schedule: schedule,
     });
+  },
+
+  'schedule.deleteAll'() {
+    if (! this.userId) {
+      throw new Meteor.Error('not-authorized');
+    }
+
+    let item = ScheduleTemplate.findOne({})
+    while (item) {
+      ScheduleTemplate.remove(item._id);
+      item = ScheduleTemplate.findOne({})
+    }
   },
 });

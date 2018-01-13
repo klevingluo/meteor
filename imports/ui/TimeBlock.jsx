@@ -2,6 +2,7 @@
 import React, { Component } from 'react';
 import Task from './Task.jsx';
 import { DropdownButton, MenuItem, Button } from 'react-bootstrap';
+import { Typeahead} from 'react-bootstrap-typeahead';
 
 export type TimeBlockType = {
   time: number,
@@ -37,13 +38,17 @@ export default class TimeBlock extends Component<Props, State> {
     Meteor.call('tasks.remove', id);
   }
 
+  formatTime(time) {
+    return time % 1 == 0 ? time + ":00" : parseInt(time) + ":30"
+  }
+
   render() {
     return (
       <tr 
         key={this.props.x.time} 
         className={this.props.x.time == this.state.hour ? "selected" : ""}
         style={{border: "1px solid black"}}>
-        <td> {this.props.x.time}: </td>
+        <td> {this.formatTime(this.props.x.time)}: </td>
         {this.props.x.appointment ? (
           [
             <td> 
@@ -63,20 +68,24 @@ export default class TimeBlock extends Component<Props, State> {
         ) : (
           <td> 
             {this.props.editMode &&
-                (<DropdownButton 
-                  title="load project"
-                  activeKey={"not"}
-                  ref="project" 
-                  id="project"
-                  name={"this"}
-                  onSelect={x => 2}
-                >
-                  {
-                    this.props.projects.map(x => (
-                      <MenuItem key={x} eventKey={x}> {x} </MenuItem>
-                    ))
-                  }
-                </DropdownButton>)
+                (
+                  <Typeahead 
+                    ref="project"
+                    options = {this.props.projects}
+                    allowNew = {true}
+                    selectHintOnEnter = {true}
+                    onChange={x => 
+                      {
+                        if (x[0].label) {
+                          this.props.changeSchedule(x[0].label)
+                        } else {
+                          console.log(x)
+                          this.props.changeSchedule(x[0])
+                        }
+                      }
+                    }
+                  />
+                )
             }
             <b>[{this.props.x.task.project}]</b> {this.props.x.task.text} 
           </td>
