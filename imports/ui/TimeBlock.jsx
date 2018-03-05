@@ -43,6 +43,34 @@ export default class TimeBlock extends Component<Props, State> {
   }
 
   render() {
+    let button = ""
+
+    if (this.props.x.task && this.props.x.task._id) {
+      button = (
+        <Button
+          className="delete btn btn-info" 
+          bsSize="xsmall"
+          onClick={
+            this.removeTask.bind(this, this.props.x.task._id)
+          }>
+          done
+        </Button>
+      )
+    }    
+
+    if (this.props.x.appointment) {
+      button = (
+        <Button
+          className="delete btn btn-danger" 
+          bsSize="xsmall"
+          onClick={
+            this.removeAppointment.bind(this, this.props.x.appointment._id)
+          }>
+          Cancel
+        </Button>
+      )
+    }    
+
     return (
       <tr 
         key={this.props.x.time} 
@@ -51,18 +79,13 @@ export default class TimeBlock extends Component<Props, State> {
         <td> {this.formatTime(this.props.x.time)}: </td>
         {this.props.x.appointment ? (
           [
-            <td> 
+            <td key="text"> 
               <span>
                 <b>[appointment]</b> {this.props.x.appointment.text}
               </span>
-              <Button
-                className="delete btn btn-danger" 
-                bsSize="xsmall"
-                onClick={
-                  this.removeAppointment.bind(this, this.props.x.appointment._id)
-                }>
-                Cancel
-              </Button>
+            </td>,
+            <td key="button"> 
+              {button}
             </td>
           ]
         ) : (
@@ -88,21 +111,6 @@ export default class TimeBlock extends Component<Props, State> {
                 )
             }
             <b>[{this.props.x.task.project}]</b> {this.props.x.task.text} 
-          </td>
-        )}
-        {this.props.x.task && this.props.x.task._id ? (
-          <td>
-            <Button
-              className="delete btn btn-info" 
-              bsSize="xsmall"
-              onClick={
-                this.removeTask.bind(this, this.props.x.task._id)
-              }>
-              done
-            </Button>
-          </td>
-        ) : (
-          <td>
           </td>
         )}
       </tr>

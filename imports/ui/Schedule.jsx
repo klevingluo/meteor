@@ -116,6 +116,7 @@ type Props = {
 
 type State = {
   collapse: boolean,
+  appointments: boolean,
 }
 
 // Schedule component - represents the schedule component of the app
@@ -125,6 +126,7 @@ class Schedule extends Component<Props, State> {
 
     this.state = {
       collapse: false,
+      appointements: false,
     };
   }
 
@@ -164,13 +166,22 @@ class Schedule extends Component<Props, State> {
 
   renderEventForm() {
     return (
-      <form className="new-task" onSubmit={this.handleSubmit.bind(this)}>
+      <form 
+        className="new-task" 
+        onSubmit={this.handleSubmit.bind(this)} 
+        id="appointment-input">
         <FormControl
           className="inline"
           type="text"
           ref="eventInput"
           placeholder="12/6/2017 23 23.5 clean up misc"
-          onFocus={this.prefillInput.bind(this)}
+          onFocus={
+            () => {
+              this.prefillInput();
+              this.setAppointments(true) 
+            } 
+          }
+          onBlur={() => this.setAppointments(false) }
         />
       </form> : ''
     )
@@ -200,6 +211,48 @@ class Schedule extends Component<Props, State> {
     this.setState({
       collapse: !this.state.collapse
     });
+  }
+
+  setAppointments(val) {
+    this.setState({
+      appointments: val
+    });
+  }
+
+  renderAppointmentList() {
+    return(
+      <div>
+        {this.state.appointments && (
+          <div>
+            <table>
+              {[this.props.appointments.map(x => (
+                <tr>
+                  <th>
+                    {x.date}
+                  </th>
+                  <th>
+                    {x.start} - {x.end} 
+                  </th>
+                  <th>
+                    {x.text}
+                  </th>
+                  <th>
+                    <Button
+                      className="delete btn btn-danger" 
+                      bsSize="xsmall"
+                      onClick={
+                        this.removeAppointment.bind(this, x._id)
+                      }>
+                      Cancel
+                    </Button>
+                  </th>
+                </tr>
+              ))]}
+            </table>
+          </div>
+        )}
+      </div>
+    );
   }
 
   renderCollapsedCheckbox() {
@@ -243,10 +296,10 @@ class Schedule extends Component<Props, State> {
     return (
       <div className="container">
         { this.renderCollapsedCheckbox() }
+        { this.renderAppointmentList() }
         { this.renderEventForm() }
         { this.renderSchedule(sched0, date, 'today') }
         { this.renderSchedule(sched1, tomorrowDate, 'tomorrow') }
-        { this.renderSchedule(sched2, date3date, '2 days from now') }
       </div>
     );
   }

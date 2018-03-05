@@ -46,9 +46,6 @@ export default class Task extends Component<Props> {
 
   render() {
 
-    const leverage = 
-      (this.props.task.utility / this.props.task.time).toString().substring(0,4);
-
     // style differently based on whether or not is checked
     // const since we don't change it
     let taskClassName = this.props.task.checked ? 'checked' : '';
@@ -88,32 +85,8 @@ export default class Task extends Component<Props> {
             placeholder={this.props.task.time}
             onChange={this.setTime.bind(this)}
           />
-          proj:
-          <FormControl
-            className="inline"
-            type="text"
-            bsSize="sm"
-            style={{width: '100px'}}
-            ref={this.props.task._id + "project"}
-            placeholder={this.props.task.project}
-            onChange={this.setProject.bind(this)}
-          />
-          { this.props.showPrivateButton ? (
-            <Button 
-              bsSize="sm"
-              onClick={this.togglePrivate.bind(this)}
-            >
-              {this.props.task.private ? 'Private' : 'Public' }
-            </Button>
-          ) : '' }
-
-          <strong> lev: </strong>
-          <span className="text"> {leverage} </span>
+          <span className="text">{this.props.task.text}</span>
         </Form>
-
-        <br/>
-        <strong> {this.props.task.username} </strong>:
-        <span className="text">{this.props.task.text}</span>
       </li>
     );
   }

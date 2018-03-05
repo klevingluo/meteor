@@ -1,3 +1,4 @@
+// @flow
 import AccountsUIWrapper from './AccountsUIWrapper.jsx';
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
@@ -6,13 +7,15 @@ import Task from './Task.jsx';
 import TaskList from './TaskList.jsx';
 import { Appointments } from '../api/appointments.js';
 import { ScheduleTemplate } from '../api/schedule.js';
-import { Col } from 'react-bootstrap';
+import { Row, Col } from 'react-bootstrap';
 import { FormControl, Button } from 'react-bootstrap';
 import { Meteor } from 'meteor/meteor';
 import { Tasks } from '../api/tasks.js';
 import { withTracker } from 'meteor/react-meteor-data';
+import type {appointmentT} from './Schedule.jsx';
 
 type Props = {
+  appointments: Array<appointmentT>,
 }
 
 type State = {
@@ -59,22 +62,9 @@ class App extends Component<Props, State> {
   }
 
   /**
-   * calculates the benefit per unit time of the task
-   */
-  getLeverage(task) {
-    if (task.checked) {
-      return -1;
-    } else if (!task.utility || !task.time) {
-      return 0;
-    } else {
-      return task.utility/task.time;
-    }
-  }
-
-  /**
    * takes a schedule and puts tasks into them
    */
-  scheduleTasks(schedule, tasks) {
+  scheduleTasks(schedule, tasks: Array<taskT>, date : string) {
     let timetable = [];
 
     for (i=0; i<schedule.length; i++) {
@@ -92,12 +82,17 @@ class App extends Component<Props, State> {
         let task = tasks.filter(x => {
           return x.project && schedule[i].priority.includes(x.project) && x.time > 0;
         })[0] 
-        if (task && task.time > 0) {
-          timetable.push({
-            time: schedule[i].time,
-            task: task,
-          });
-          task.time = task.time - 1;
+        if (task) {
+          if (!task.timeleft) {
+            task.timeleft = task.time
+          }
+          if (task.timeleft > 0) {
+            timetable.push({
+              time: schedule[i].time,
+              task: task,
+            });
+            task.timeleft = task.timeleft - 1;
+          }
         } else {
           timetable.push({
             time: schedule[i].time,
@@ -110,75 +105,40 @@ class App extends Component<Props, State> {
   }
 
   handleKey(e) {
-    switch(e.key) {
-      case 'ArrowRight':
-        this.setState({
-          activeWindow: (this.state.activeWindow + 1) % 3
-        });
-        break;
-      case 'ArrowLeft':
-        this.setState({
-          activeWindow: (this.state.activeWindow - 1) % 3
-        });
-        break;
-      case 'o':
-        //document.getElementsByClassName("rbt-input")[0].focus()
-        break;
-      default:
+    if (document.activeElement.nodeName != "INPUT") {
+      switch(e.key) {
+        case 'l':
+          this.setState({
+            activeWindow: (this.state.activeWindow + 1) % 3
+          });
+          break;
+        case 'h':
+          this.setState({
+            activeWindow: (this.state.activeWindow - 1) % 3
+          });
+          break;
+        case 'a':
+          document.getElementById("appointment-input")[0].focus()
+          break;
+        case 'p':
+          document.getElementById("project-input")[0].focus()
+          break;
+        case 't':
+          document.getElementById("task-input")[0].focus()
+          break;
+        case 'o':
+          //document.getElementsByClassName("rbt-input")[0].focus()
+          break;
+        default:
+      }
+    } else {
+      switch(e.key) {
+        case 'Escape':
+          document.activeElement.blur()
+        default:
+      }
     }
-
   }
-
-  rubric = (<div>
-    <ul>
-      <li> 
-        <p>
-          type <b> times </b> in console to see length 
-          of projects and <b> priorities </b> to see time 
-          allocated
-        </p>
-      </li>
-      <li>
-        <table>
-          <tbody>
-            <tr>
-              <th></th>
-              <th> urgent </th>
-              <th> time sensitive </th>
-              <th> only waiting on me </th>
-            </tr>
-            <tr>
-              <td><b>milestone</b></td>
-              <td>21</td>
-              <td>13</td>
-              <td>8</td>
-            </tr>
-            <tr>
-              <td><b>progress</b></td>
-              <td>13</td>
-              <td>8</td>
-              <td>5</td>
-            </tr>
-            <tr>
-              <td><b>small progress</b></td>
-              <td>5</td>
-              <td>3</td>
-              <td>1</td>
-            </tr>
-          </tbody>
-        </table>
-      </li>
-    </ul>
-    <ul>
-      <li>1: 30 min / brainless</li>
-      <li>2: 1 hr / minor effort</li>
-      <li>4: 2 hr / will take research</li>
-      <li>8: 4 hr / not sure how to proceed</li>
-      <li>16: 8 hr / not sure where to start</li>
-      <li>64: 32 hr / hard for an expert, and I'm not one</li>
-      <li>128: 64 hr / hard for an expert, and I'm clueless</li>
-    </ul>
-</div>)
 
   changeSchedule(day, hour, priority) {
     let timetable = JSON.parse(JSON.stringify( this.props.schedule[day].schedule));
@@ -226,6 +186,18 @@ class App extends Component<Props, State> {
       projects = Array.from(projects);
     }
 
+    rubric = (<div>
+      <ul>
+        <li> <b> priorities</b></li>
+      {Object.getOwnPropertyNames(window.priorities)
+          .sort((a,b) => {return window.priorities[a] > window.priorities[b] ? -1 : 1})
+          .map(x => {
+            return (<li key={x}> {x} : {window.priorities[x]}</li>)
+          })}
+        </ul>
+    </div>)
+
+
     let date = new Date();
 
     // start scheduling tasks
@@ -242,9 +214,9 @@ class App extends Component<Props, State> {
 
     let tasks = JSON.parse(JSON.stringify(this.props.tasks)); 
 
-    let today_sched = this.scheduleTasks(today, tasks);
-    let tom_sched = this.scheduleTasks(tomorrow, tasks);
-    let date3_sched = this.scheduleTasks(date3, tasks);
+    let today_sched = this.scheduleTasks(today, tasks, date.toLocaleString());
+    let tom_sched = this.scheduleTasks(tomorrow, tasks, tomorrowDate.toLocaleString());
+    let date3_sched = this.scheduleTasks(date3, tasks, date3date.toLocaleString());
     // end scheudlling tasks
 
     let schedule = [today_sched , tom_sched , date3_sched] 
@@ -254,17 +226,18 @@ class App extends Component<Props, State> {
         row={this.state.row}
         tasks={this.props.tasks}
         projects={projects}
+        appointments={this.props.appointments}
         schedule={schedule}
         changeSchedule={this.changeSchedule.bind(this)}
       />),
       (<TaskList 
         row={this.state.row}
-        tasks={this.props.tasks}
+        tasks={tasks}
         projects={projects}
         project={today[0].priority}
         schedule={this.props.schedule}
       />),
-      this.rubric
+      rubric
     ]
 
     return (
@@ -273,15 +246,17 @@ class App extends Component<Props, State> {
           rel="stylesheet" 
           href="https://maxcdn.bootstrapcdn.com/bootstrap/latest/css/bootstrap.min.css"
         />
-        <Col sm={12} md={12} lg={4} xl={4}>
-          {windows[(this.state.activeWindow + 0 + windows.length) % windows.length]}
-        </Col>
-        <Col sm={12} md={12} lg={4} xl={4}>
-          {windows[(this.state.activeWindow + 1 + windows.length) % windows.length]}
-        </Col>
-        <Col sm={12} md={12} lg={4} xl={4}>
-          {windows[(this.state.activeWindow + 2 + windows.length) % windows.length]}
-        </Col>
+        <Row>
+          <Col sm={12} md={12} lg={4} xl={4}>
+            {windows[(this.state.activeWindow + 0 + windows.length) % windows.length]}
+          </Col>
+          <Col sm={12} md={12} lg={4} xl={4}>
+            {windows[(this.state.activeWindow + 1 + windows.length) % windows.length]}
+          </Col>
+          <Col sm={12} md={12} lg={4} xl={4}>
+            {windows[(this.state.activeWindow + 2 + windows.length) % windows.length]}
+          </Col>
+        </Row>
       </div>
     );
   }
@@ -297,7 +272,6 @@ function tick() {
     hour: hour
   });
 }
-
 
 /**
  * calculates the benefit per unit time of the task
@@ -316,7 +290,7 @@ export default withTracker(props => {
   Meteor.subscribe('tasks');
   Meteor.subscribe('appointments');
   Meteor.subscribe('schedule');
-  const appointments = Appointments.find({}, {sort: {createdAt: -1}}).fetch();
+  const appointments = Appointments.find({}, {sort: {date: 1}}).fetch();
   const schedule = ScheduleTemplate.find({}, {sort: {day: 1}}).fetch();
 
   const tasks = Tasks.find({}, {})
